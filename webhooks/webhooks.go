@@ -17,7 +17,7 @@ const (
 	VERBOSE = false
 )
 
-var chPayloads = make(chan *GitHubPayload)
+var ChPayloads = make(chan *GitHubPayload)
 
 //
 // Accept GitHub Webhook data
@@ -40,7 +40,7 @@ func WebhookHandler(w http.ResponseWriter, req *http.Request) {
 		fmt.Printf("Returned from BodyToCommit: %v\n", err)
 		return
 	}
-	chPayloads <- payload
+	ChPayloads <- payload
 	return
 }
 
@@ -48,7 +48,7 @@ func WebhookHandler(w http.ResponseWriter, req *http.Request) {
 // parses the relevant data, then sends it over the given channel
 func WebhookListener(port string, payloads chan *GitHubPayload) {
 	// FIXME: Can using global variables possibly be a non-bad idea?
-	chPayloads = payloads
+	ChPayloads = payloads
 	http.HandleFunc("/webhook", WebhookHandler)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		fmt.Printf("Error in WebhookListener ListenAndServe: %v\n", err)
